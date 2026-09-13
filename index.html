@@ -171,6 +171,23 @@
           })
           .searchSchool(code);
       }
+      function searchCode() {
+  var code = document.getElementById("codeInput").value;
+  document.getElementById("status").innerText = "തിരയുന്നു... ദയവായി കാത്തിരിക്കൂ...";
+
+  google.script.run
+    .withSuccessHandler(function(url) {
+      if (url) {
+        window.location.href = url; // or render result
+      } else {
+        document.getElementById("status").innerText = "ഡാറ്റ കണ്ടെത്താനായില്ല!";
+      }
+    })
+    .withFailureHandler(function(error) {
+      document.getElementById("status").innerText = "Error: " + error.message;
+    })
+    .getWikiUrl(code); // Replace 'getWikiUrl' with your actual backend function name
+}
     </script>
   </body>
 </html>
