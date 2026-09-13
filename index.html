@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      * {
+        box-sizing: border-box;
+        font-family: 'Gayathri', 'Manjari', 'Segoe UI', Tahoma, sans-serif;
+      }
+      body {
+        background-color: #f0f4f8;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+      .card {
+        background: #ffffff;
+        padding: 30px 24px;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        width: 100%;
+        max-width: 480px;
+        text-align: center;
+      }
+      h2 {
+        color: #1a365d;
+        font-size: 1.35rem;
+        margin-bottom: 24px;
+        line-height: 1.5;
+        font-weight: 700;
+      }
+      .search-box {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      input[type="text"] {
+        width: 100%;
+        padding: 14px;
+        font-size: 1rem;
+        border: 2px solid #cbd5e1;
+        border-radius: 10px;
+        outline: none;
+        transition: border-color 0.2s;
+        text-align: center;
+      }
+      input[type="text"]:focus {
+        border-color: #2563eb;
+      }
+      button {
+        background-color: #2563eb;
+        color: white;
+        border: none;
+        padding: 14px;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+      button:hover {
+        background-color: #1d4ed8;
+      }
+      .result-box {
+        margin-top: 20px;
+        padding: 16px;
+        border-radius: 10px;
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        display: none;
+        text-align: left;
+      }
+      .result-item {
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+        color: #334155;
+      }
+      .open-btn {
+        display: inline-block;
+        width: 100%;
+        text-align: center;
+        background-color: #16a34a;
+        color: white;
+        padding: 12px;
+        margin-top: 12px;
+        text-decoration: none;
+        font-weight: bold;
+        border-radius: 8px;
+        transition: background-color 0.2s;
+      }
+      .open-btn:hover {
+        background-color: #15803d;
+      }
+      .error-msg {
+        color: #dc2626;
+        margin-top: 15px;
+        font-weight: 500;
+      }
+      .loading {
+        display: none;
+        margin-top: 15px;
+        color: #64748b;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="card">
+      <h2>സ്കൂൾ വിക്കിയിലെ നിങ്ങളുടെ ലിറ്റിൽകൈറ്റ്സ് പേജ് കാണാം</h2>
+      
+      <div class="search-box">
+        <input type="text" id="schoolCode" placeholder="Search by Code (e.g. 21006)" autocomplete="off">
+        <button onclick="handleSearch()">Search</button>
+      </div>
+
+      <div id="loading" class="loading">തിരയുന്നു... ദയവായി കാത്തിരിക്കൂ...</div>
+      <div id="errorMessage" class="error-msg"></div>
+
+      <div id="resultBox" class="result-box">
+        <div class="result-item"><strong>സ്കൂൾ കോഡ്:</strong> <span id="resCode"></span></div>
+        <div class="result-item"><strong>സ്കൂളിന്റെ പേര്:</strong> <span id="resName"></span></div>
+        <div class="result-item"><strong>ഉപജില്ല:</strong> <span id="resSubdistrict"></span></div>
+        <a id="wikiLink" href="#" target="_blank" class="open-btn">സ്കൂൾ വിക്കി പേജ് തുറക്കുക (Next Tab)</a>
+      </div>
+    </div>
+
+    <script>
+      function handleSearch() {
+        var code = document.getElementById('schoolCode').value.trim();
+        var errorDiv = document.getElementById('errorMessage');
+        var resultBox = document.getElementById('resultBox');
+        var loading = document.getElementById('loading');
+
+        errorDiv.innerText = '';
+        resultBox.style.display = 'none';
+
+        if (!code) {
+          errorDiv.innerText = 'ദയവായി ഒരു സ്കൂൾ കോഡ് നൽകുക!';
+          return;
+        }
+
+        loading.style.display = 'block';
+
+        google.script.run
+          .withSuccessHandler(function(data) {
+            loading.style.display = 'none';
+            if (data.success) {
+              document.getElementById('resCode').innerText = data.code;
+              document.getElementById('resName').innerText = data.name;
+              document.getElementById('resSubdistrict').innerText = data.subdistrict;
+              
+              if (data.link && data.link !== '') {
+                var btn = document.getElementById('wikiLink');
+                btn.href = data.link;
+                btn.style.display = 'inline-block';
+              } else {
+                var btn = document.getElementById('wikiLink');
+                btn.style.display = 'none';
+                errorDiv.innerText = 'ഈ സ്കൂളിന്റെ ലിങ്ക് ലഭ്യമല്ല!';
+              }
+              
+              resultBox.style.display = 'block';
+            } else {
+              errorDiv.innerText = data.message;
+            }
+          })
+          .searchSchool(code);
+      }
+    </script>
+  </body>
+</html>
