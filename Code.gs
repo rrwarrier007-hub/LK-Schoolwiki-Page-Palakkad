@@ -1,5 +1,5 @@
 function doGet() {
-  return HtmlService.createTemplateFromFile('Index')
+  return HtmlService.createTemplateFromFile('index')
     .evaluate()
     .setTitle('Little Kites School Wiki Search')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
